@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tanuki</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .manga-card:hover { transform: translateY(-4px); }
+        .page-transition { transition: all 0.3s ease-in-out; }
+        .comment-bubble { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .scan-group-badge { background: linear-gradient(45deg, #ea580c 0%, #c2410c 100%); }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-black border-b border-neutral-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-8">
+                    <h1 class="text-2xl font-bold text-orange-500 cursor-pointer" onclick="showPage('home')">Tanuki</h1>
+                    <div class="hidden md:flex space-x-6">
+                        <button onclick="showPage('home')" class="nav-btn text-neutral-300 hover:text-orange-400 px-3 py-2 rounded-md">Biblioteca</button>
+                        <button onclick="showPage('communities')" class="nav-btn text-neutral-300 hover:text-orange-400 px-3 py-2 rounded-md">Comunidades</button>
+                        <button onclick="showPage('scan-groups')" class="nav-btn text-neutral-300 hover:text-orange-400 px-3 py-2 rounded-md">Grupos</button>
+                        
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <input type="text" placeholder="Buscar manga..." class="bg-neutral-900 text-white px-4 py-2 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <span class="absolute right-4 top-2.5 text-neutral-400">⌕</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <a href="login.html" class="text-orange hover:underline font-semibold">Iniciar sesión</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Page - Biblioteca -->
+    <div id="home-page" class="page-content">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Favoritos Section -->
+            <section class="mb-12">
+                <h2 class="text-3xl font-bold mb-6 text-white-500">Mis Favoritos</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                    <div class="manga-card bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden cursor-pointer transition-transform duration-300" onclick="showMangaDetail('attack-titan')">
+                        <div class="h-48 bg-gradient-to-b from-orange-600 to-orange-800 flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">AOT</span>
+                        </div>
+                        <div class="p-3">
+                            <h3 class="font-semibold text-sm text-white">Attack on Titan</h3>
+                            <p class="text-xs text-neutral-400">Cap. 139/139</p>
+                            <div class="flex items-center mt-2">
+                                <span class="text-orange-400 text-xs">★ 9.8</span>
+                                <span class="ml-2 text-xs text-green-400">Completado</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="manga-card bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden cursor-pointer transition-transform duration-300" onclick="showMangaDetail('one-piece')">
+                        <div class="h-48 bg-gradient-to-b from-orange-600 to-orange-800 flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">One Piecezzz</span>
+                        </div>
+                        <div class="p-3">
+                            <h3 class="font-semibold text-sm text-white">One Piece</h3>
+                            <p class="text-xs text-neutral-400">Cap. 1095/???</p>
+                            <div class="flex items-center mt-2">
+                                <span class="text-orange-400 text-xs">★ 9.9</span>
+                                <span class="ml-2 text-xs text-yellow-400">Leyendo</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="manga-card bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden cursor-pointer transition-transform duration-300" onclick="showMangaDetail('demon-slayer')">
+                        <div class="h-48 bg-gradient-to-b from-orange-600 to-orange-800 flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">DS</span>
+                        </div>
+                        <div class="p-3">
+                            <h3 class="font-semibold text-sm text-white">Demon Slayer</h3>
+                            <p class="text-xs text-neutral-400">Cap. 205/205</p>
+                            <div class="flex items-center mt-2">
+                                <span class="text-orange-400 text-xs">★ 9.5</span>
+                                <span class="ml-2 text-xs text-green-400">Completado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Populares -->
+            <section class="mb-12">
+                <h2 class="text-3xl font-bold mb-6 text-white-500">Populares Esta Semana</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                    <div class="manga-card bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden cursor-pointer transition-transform duration-300" onclick="showMangaDetail('jujutsu-kaisen')">
+                        <div class="h-48 bg-gradient-to-b from-orange-600 to-orange-800 flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">JJK</span>
+                        </div>
+                        <div class="p-3">
+                            <h3 class="font-semibold text-sm text-white">Jujutsu Kaisen</h3>
+                            <p class="text-xs text-neutral-400">Cap. 245/???</p>
+                            <div class="flex items-center mt-2">
+                                <span class="text-orange-400 text-xs">★ 9.3</span>
+                                <span class="ml-2 text-xs text-orange-400">Nuevo</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="manga-card bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden cursor-pointer transition-transform duration-300">
+                        <div class="h-48 bg-gradient-to-b from-orange-600 to-orange-800 flex items-center justify-center">
+                            <span class="text-white font-bold text-lg">MHA</span>
+                        </div>
+                        <div class="p-3">
+                            <h3 class="font-semibold text-sm text-white">My Hero Academia</h3>
+                            <p class="text-xs text-neutral-400">Cap. 408/???</p>
+                            <div class="flex items-center mt-2">
+                                <span class="text-orange-400 text-xs">★ 9.1</span>
+                                <span class="ml-2 text-xs text-orange-400">Activo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recientes -->
+            <section>
+                <h2 class="text-3xl font-bold mb-6 text-white-500">Actualizaciones Recientes</h2>
+                <div class="space-y-4">
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 flex items-center space-x-4 hover:bg-neutral-800 cursor-pointer">
+                        <div class="w-16 h-20 bg-gradient-to-b from-orange-600 to-orange-800 rounded flex items-center justify-center">
+                            <span class="text-white font-bold">AOT</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-white">Attack on Titan</h3>
+                            <p class="text-sm text-white">Capítulo 139 - "El Final"</p>
+                            <p class="text-xs text-neutral-400">Subido por: deadlock main • Hace 2 horas</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-sm text-orange-400">Leer</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Manga Detail Page -->
+    <div id="manga-detail-page" class="page-content hidden">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <button onclick="showPage('home')" class="mb-6 text-white-400 hover:text-white-300 flex items-center">
+                ← Volver a la biblioteca
+            </button>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Manga Info -->
+                <div class="md:col-span-1">
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden">
+                        <div class="h-96 bg-gradient-to-b from-orange-600 to-orange-800 flex items-center justify-center">
+                            <span class="text-white font-bold text-6xl">AOT</span>
+                        </div>
+                        <div class="p-6">
+                            <h1 class="text-2xl font-bold mb-4 text-white">Attack on Titan</h1>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-neutral-400">Estado:</span>
+                                    <span class="text-orange-400">Completado</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-neutral-400">Capítulos:</span>
+                                    <span class="text-white">139</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-neutral-400">Calificación:</span>
+                                    <span class="text-orange-400">★ 9.8/10</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-neutral-400">Géneros:</span>
+                                    <span class="text-sm text-white">Acción, Drama</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="mt-6 space-y-3">
+                                <button class="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg font-semibold transition-colors">
+                                    Agregar a Favoritos
+                                </button>
+                                <button class="w-full bg-neutral-800 hover:bg-neutral-700 text-white py-3 rounded-lg font-semibold transition-colors border border-orange-500">
+                                    Conectar MyAnimeList
+                                </button>
+                                <button class="w-full bg-neutral-800 hover:bg-neutral-700 text-white py-3 rounded-lg font-semibold transition-colors border border-orange-500">
+                                    Conectar AniList
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Area -->
+                <div class="md:col-span-2">
+                    <!-- Description -->
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6 mb-6">
+                        <h2 class="text-xl font-semibold mb-4 text-orange-500">Descripción</h2>
+                        <p class="text-white leading-relaxed">
+                            La humanidad vive encerrada tras enormes muros debido a los Titanes, gigantescas criaturas humanoides que devoran humanos aparentemente sin razón. Eren Yeager vive en el distrito de Shiganshina junto a su hermana adoptiva Mikasa Ackerman y su mejor amigo Armin Arlert. Cuando un Titán Colosal aparece de la nada y destruye la muralla exterior...
+                        </p>
+                    </div>
+
+                    <!-- Chapters List -->
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+                        <h2 class="text-xl font-semibold mb-4 text-orange-500">Capítulos</h2>
+                        <div class="space-y-2 max-h-96 overflow-y-auto">
+                            <div class="flex items-center justify-between p-3 bg-neutral-800 border border-neutral-700 rounded-lg hover:bg-neutral-700 cursor-pointer" onclick="showReader(139)">
+                                <div>
+                                    <span class="font-medium text-white">Capítulo 139</span>
+                                    <span class="text-neutral-400 ml-2">- "Hacia el Árbol en Aquella Colina"</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xs text-neutral-400">Hace 1 año</span>
+                                    <span class="text-orange-400">Leer</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-neutral-800 border border-neutral-700 rounded-lg hover:bg-neutral-700 cursor-pointer" onclick="showReader(138)">
+                                <div>
+                                    <span class="font-medium text-white">Capítulo 138</span>
+                                    <span class="text-neutral-400 ml-2">- "Una Larga Pesadilla"</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xs text-neutral-400">Hace 1 año</span>
+                                    <span class="text-orange-400">Leer</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-neutral-800 border border-neutral-700 rounded-lg hover:bg-neutral-700 cursor-pointer">
+                                <div>
+                                    <span class="font-medium text-white">Capítulo 137</span>
+                                    <span class="text-neutral-400 ml-2">- "Titanes"</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xs text-neutral-400">Hace 1 año</span>
+                                    <span class="text-orange-400">Leer</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reader Page -->
+    <div id="reader-page" class="page-content hidden">
+        <div class="bg-black min-h-screen">
+            <!-- Reader Header -->
+            <div class="bg-black border-b border-neutral-800 p-4">
+                <div class="max-w-4xl mx-auto flex items-center justify-between">
+                    <button onclick="showMangaDetail('attack-titan')" class="text-orange-500 hover:text-orange-400">
+                        ← Volver al manga
+                    </button>
+                    <div class="text-center">
+                        <h2 class="font-semibold text-white">Attack on Titan - Capítulo 139</h2>
+                        <p class="text-sm text-neutral-400">Página <span id="current-page">1</span> de 45</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="prevPage()" class="bg-neutral-800 hover:bg-neutral-700 text-white px-4 py-2 rounded border border-orange-500">◀ Anterior</button>
+                        <button onclick="nextPage()" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded">Siguiente ▶</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reader Content -->
+            <div class="max-w-4xl mx-auto p-4">
+                <!-- Manga Page -->
+                <div class="bg-white rounded-lg mb-6 flex items-center justify-center" style="height: 800px;">
+                    <div class="text-center text-gray-800">
+                        <div class="text-6xl mb-4">📖</div>
+                        <p class="text-xl font-semibold">Página del Manga</p>
+                        <p class="text-gray-600">Aquí se mostraría la imagen del manga</p>
+                        <p class="text-sm text-gray-500 mt-2">Página <span id="page-number">1</span></p>
+                    </div>
+                </div>
+
+                <!-- Comments Section for Current Page -->
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-orange-500">Comentarios de esta página (<span id="page-comments">Página 1</span>)</h3>
+                    
+                    <!-- Comment Input -->
+                    <div class="mb-6">
+                        <div class="flex space-x-3">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23ea580c'/%3E%3Ctext x='16' y='21' text-anchor='middle' fill='white' font-size='14' font-weight='bold'%3EU%3C/text%3E%3C/svg%3E" alt="Usuario" class="w-8 h-8 rounded-full">
+                            <div class="flex-1">
+                                <textarea id="comment-input" placeholder="Escribe tu comentario sobre esta página..." class="w-full bg-neutral-800 text-white p-3 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-orange-500" rows="3"></textarea>
+                                <div class="flex items-center justify-between mt-2">
+                                    <div class="flex space-x-2">
+                                        <button class="text-neutral-400 hover:text-orange-400">Imagen</button>
+                                        <button class="text-neutral-400 hover:text-orange-400">GIF</button>
+                                    </div>
+                                    <button onclick="addComment()" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg">Comentar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comments List -->
+                    <div id="comments-container" class="space-y-4">
+                        <div class="comment-bubble flex space-x-3">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23ea580c'/%3E%3Ctext x='16' y='21' text-anchor='middle' fill='white' font-size='14' font-weight='bold'%3EM%3C/text%3E%3C/svg%3E" alt="Usuario" class="w-8 h-8 rounded-full">
+                            <div class="flex-1">
+                                <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-3">
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        <span class="font-medium text-sm text-white">MangaFan2024</span>
+                                        <span class="text-xs text-neutral-400">hace 5 min</span>
+                                    </div>
+                                    <p class="text-sm text-white">¡Esta página es increíble! La expresión de Eren aquí me da escalofríos</p>
+                                </div>
+                                <div class="flex items-center space-x-4 mt-2 text-xs text-neutral-400">
+                                    <button class="hover:text-orange-400">↑ 12</button>
+                                    <button class="hover:text-orange-400">↓ 0</button>
+                                    <button class="hover:text-orange-400">Responder</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="comment-bubble flex space-x-3">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23ea580c'/%3E%3Ctext x='16' y='21' text-anchor='middle' fill='white' font-size='14' font-weight='bold'%3EA%3C/text%3E%3C/svg%3E" alt="Usuario" class="w-8 h-8 rounded-full">
+                            <div class="flex-1">
+                                <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-3">
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        <span class="font-medium text-sm text-white">AttackOnReader</span>
+                                        <span class="text-xs text-neutral-400">hace 12 min</span>
+                                    </div>
+                                    <p class="text-sm text-white">El arte de Isayama en esta página es simplemente perfecto. Cada detalle cuenta una historia.</p>
+                                </div>
+                                <div class="flex items-center space-x-4 mt-2 text-xs text-neutral-400">
+                                    <button class="hover:text-orange-400">↑ 8</button>
+                                    <button class="hover:text-orange-400">↓ 0</button>
+                                    <button class="hover:text-orange-400">Responder</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Communities Page -->
+    <div id="communities-page" class="page-content hidden">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <h1 class="text-3xl font-bold mb-8 text-white-500">Comunidades</h1>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Communities List -->
+                <div class="md:col-span-1">
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+                        <h2 class="text-xl font-semibold mb-4 text-white">Mis Comunidades</h2>
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3 p-3 bg-neutral-800 border border-neutral-700 rounded-lg cursor-pointer hover:bg-neutral-700" onclick="selectCommunity('attack-titan')">
+                                <div class="w-8 h-8 bg-orange-600 rounded flex items-center justify-center">
+                                    <span class="text-white font-bold text-xs">AOT</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-white">Attack on Titan</p>
+                                    <p class="text-xs text-neutral-400">15.2k miembros</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3 p-3 bg-neutral-800 border border-neutral-700 rounded-lg cursor-pointer hover:bg-neutral-700" onclick="selectCommunity('one-piece')">
+                                <div class="w-8 h-8 bg-orange-600 rounded flex items-center justify-center">
+                                    <span class="text-white font-bold text-xs">OP</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-white">One Piece</p>
+                                    <p class="text-xs text-neutral-400">28.7k miembros</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3 p-3 bg-neutral-800 border border-neutral-700 rounded-lg cursor-pointer hover:bg-neutral-700">
+                                <div class="w-8 h-8 bg-orange-600 rounded flex items-center justify-center">
+                                    <span class="text-white font-bold text-xs">JJK</span>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-white">Jujutsu Kaisen</p>
+                                    <p class="text-xs text-neutral-400">12.1k miembros</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Community Feed -->
+                <div class="md:col-span-2">
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-12 h-12 bg-orange-600 rounded flex items-center justify-center">
+                                <span class="text-white font-bold">AOT</span>
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-semibold text-white">Comunidad Attack on Titan</h2>
+                                <p class="text-sm text-neutral-400">15.2k miembros activos</p>
+                            </div>
+                        </div>
+
+                        <!-- Create Post -->
+                        <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-4 mb-6">
+                            <div class="flex space-x-3">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23ea580c'/%3E%3Ctext x='16' y='21' text-anchor='middle' fill='white' font-size='14' font-weight='bold'%3EU%3C/text%3E%3C/svg%3E" alt="Usuario" class="w-8 h-8 rounded-full">
+                                <div class="flex-1">
+                                    <textarea placeholder="¿Qué piensas sobre Attack on Titan?" class="w-full bg-neutral-900 text-white p-3 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-orange-500" rows="3"></textarea>
+                                    <div class="flex items-center justify-between mt-3">
+                                        <div class="flex space-x-3">
+                                            <button class="text-neutral-400 hover:text-white">Foto</button>
+                                            <button class="text-neutral-400 hover:text-white">GIF</button>
+                                            <button class="text-neutral-400 hover:text-white">Encuesta</button>
+                                        </div>
+                                        <button class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg">Publicar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Posts Feed -->
+                        <div class="space-y-6">
+                            <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-4">
+                                <div class="flex items-center space-x-3 mb-3">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23ef4444'/%3E%3Ctext x='16' y='21' text-anchor='middle' fill='white' font-size='14' font-weight='bold'%3ET%3C/text%3E%3C/svg%3E" alt="Usuario" class="w-8 h-8 rounded-full">
+                                    <div>
+                                        <p class="font-medium text-white">PercyHunter</p>
+                                        <p class="text-xs text-neutral-400">hace 2 horas</p>
+                                    </div>
+                                </div>
+                                <p class="mb-3 text-white">¿Alguien más piensa que el final de Attack on Titan fue perfecto? Isayama realmente cerró todos los arcos narrativos de manera brillante.</p>
+                                <div class="flex items-center space-x-6 text-sm text-neutral-400">
+                                    <button class="hover:text-orange-400 flex items-center space-x-1">
+                                        <span>↑</span>
+                                        <span>24</span>
+                                    </button>
+                                    <button class="hover:text-orange-400 flex items-center space-x-1">
+                                        <span>Comentar</span>
+                                        <span>8</span>
+                                    </button>
+                                    <button class="hover:text-orange-400 flex items-center space-x-1">
+                                        <span>Compartir</span>
+                                        <span>3</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-4">
+                                <div class="flex items-center space-x-3 mb-3">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%2310b981'/%3E%3Ctext x='16' y='21' text-anchor='middle' fill='white' font-size='14' font-weight='bold'%3ES%3C/text%3E%3C/svg%3E" alt="Usuario" class="w-8 h-8 rounded-full">
+                                    <div>
+                                        <p class="font-medium text-white">fabros1231</p>
+                                        <p class="text-xs text-neutral-400">hace 4 horas</p>
+                                    </div>
+                                </div>
+                                <p class="mb-3 text-white">Acabo de releer el capítulo 121 y sigo sin poder creer la genialidad de los Paths. La forma en que Isayama manejó el tiempo es increíble.</p>
+                                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-3 mb-3">
+                                    <p class="text-sm text-center text-neutral-300">Imagen: Eren y Zeke en los Paths</p>
+                                </div>
+                                <div class="flex items-center space-x-6 text-sm text-neutral-400">
+                                    <button class="hover:text-orange-400 flex items-center space-x-1">
+                                        <span>↑</span>
+                                        <span>31</span>
+                                    </button>
+                                    <button class="hover:text-orange-400 flex items-center space-x-1">
+                                        <span>Comentar</span>
+                                        <span>12</span>
+                                    </button>
+                                    <button class="hover:text-orange-400 flex items-center space-x-1">
+                                        <span>Compartir</span>
+                                        <span>5</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scan Groups Page -->
+    <div id="scan-groups-page" class="page-content hidden">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex items-center justify-between mb-8">
+                <h1 class="text-3xl font-bold text-white-500">Grupos</h1>
+                <button onclick="showCreateScanGroup()" class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-semibold">
+                    Crear Grupo
+                </button>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Scan Group Card -->
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-12 h-12 scan-group-badge rounded-lg flex items-center justify-center text-white font-bold">
+                            TS
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-white">Percy Scan</h3>
+                            <p class="text-sm text-neutral-400">15 miembros</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-white mb-4">Especializados en manga de acción y drama. Traducciones de alta calidad desde 2020.</p>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-neutral-400">Proyectos activos:</span>
+                            <span class="text-white">3</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-neutral-400">Capítulos subidos:</span>
+                            <span class="text-white">247</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-neutral-400">Calificación:</span>
+                            <span class="text-orange-400">★ 4.8</span>
+                        </div>
+                    </div>
+                    <button class="w-full bg-neutral-800 hover:bg-neutral-700 text-white py-2 rounded-lg">
+                        Ver Proyectos
+                    </button>
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-700 rounded-lg flex items-center justify-center text-white font-bold">
+                            MS
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-white">Manga Percy</h3>
+                            <p class="text-sm text-neutral-400">8 miembros</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-white mb-4">Grupo enfocado en shounen y seinen. Rápidas actualizaciones y excelente calidad.</p>
+                    <div class="space-y-2 mb-4">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-neutral-400">Proyectos activos:</span>
+                            <span class="text-white">5</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-neutral-400">Capítulos subidos:</span>
+                            <span class="text-white">189</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-neutral-400">Calificación:</span>
+                            <span class="text-orange-400">★ 4.6</span>
+                        </div>
+                    </div>
+                    <button class="w-full bg-neutral-800 hover:bg-neutral-700 text-white py-2 rounded-lg">
+                        Ver Proyectos
+                    </button>
+                </div>
+
+                <!-- Create Group Card -->
+                <div class="bg-neutral-900 border-2 border-dashed border-neutral-600 rounded-lg p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:border-orange-500 transition-colors" onclick="showCreateScanGroup()">
+                    <div class="w-16 h-16 bg-neutral-800 rounded-full flex items-center justify-center mb-4">
+                        <span class="text-3xl text-orange-500">+</span>
+                    </div>
+                    <h3 class="font-semibold mb-2 text-white">Crear Nuevo Grupo</h3>
+                    <p class="text-sm text-neutral-400">Forma tu propio equipo de scanlation y comparte manga con la comunidad</p>
+                </div>
+            </div>
+
+            <!-- Create Scan Group Modal -->
+            <div id="create-scan-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-8 max-w-md w-full mx-4">
+                    <h2 class="text-2xl font-bold mb-6 text-white">Crear Grupo</h2>
+                    <form class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-white">Nombre del Grupo</label>
+                            <input type="text" placeholder="Ej: Dragon Scans" class="w-full bg-neutral-800 text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-white">Descripción</label>
+                            <textarea placeholder="Describe tu grupo y especialidades..." class="w-full bg-neutral-800 text-white p-3 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-orange-500" rows="3"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2 text-white">Géneros de Especialidad</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" class="rounded">
+                                    <span class="text-sm text-white">Acción</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" class="rounded">
+                                    <span class="text-sm text-white">Romance</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" class="rounded">
+                                    <span class="text-sm text-white">Shounen</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" class="rounded">
+                                    <span class="text-sm text-white">Seinen</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="flex space-x-3 pt-4">
+                            <button type="button" onclick="hideCreateScanGroup()" class="flex-1 bg-neutral-700 hover:bg-neutral-600 text-white py-3 rounded-lg">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-lg">
+                                Crear Grupo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let currentChapter = 139;
+
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId + '-page').classList.remove('hidden');
+            
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-orange-400');
+                btn.classList.add('text-gray-300');
+            });
+        }
+
+        function showMangaDetail(mangaId) {
+            showPage('manga-detail');
+        }
+
+        function showReader(chapter) {
+            currentChapter = chapter;
+            currentPage = 1;
+            updateReaderPage();
+            showPage('reader');
+        }
+
+        function updateReaderPage() {
+            document.getElementById('current-page').textContent = currentPage;
+            document.getElementById('page-number').textContent = currentPage;
+            document.getElementById('page-comments').textContent = `Página ${currentPage}`;
+        }
+
+        function nextPage() {
+            if (currentPage < 45) {
+                currentPage++;
+                updateReaderPage();
+                // Simulate page change with animation
+                const pageElement = document.querySelector('.bg-white');
+                pageElement.style.opacity = '0.5';
+                setTimeout(() => {
+                    pageElement.style.opacity = '1';
+                }, 200);
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updateReaderPage();
+                // Simulate page change with animation
+                const pageElement = document.querySelector('.bg-white');
+                pageElement.style.opacity = '0.5';
+                setTimeout(() => {
+                    pageElement.style.opacity = '1';
+                }, 200);
+            }
+        }
+
+        function addComment() {
+            const input = document.getElementById('comment-input');
+            const comment = input.value.trim();
+            
+            if (comment) {
+                const container = document.getElementById('comments-container');
+                const newComment = document.createElement('div');
+                newComment.className = 'comment-bubble flex space-x-3';
+                newComment.innerHTML = `
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23ea580c'/%3E%3Ctext x='16' y='21' text-anchor='middle' fill='white' font-size='14' font-weight='bold'%3EU%3C/text%3E%3C/svg%3E" alt="Usuario" class="w-8 h-8 rounded-full">
+                    <div class="flex-1">
+                        <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-3">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="font-medium text-sm text-white">Usuario123</span>
+                                <span class="text-xs text-neutral-400">ahora</span>
+                            </div>
+                            <p class="text-sm text-white">${comment}</p>
+                        </div>
+                        <div class="flex items-center space-x-4 mt-2 text-xs text-neutral-400">
+                            <button class="hover:text-orange-400">↑ 0</button>
+                            <button class="hover:text-orange-400">↓ 0</button>
+                            <button class="hover:text-orange-400">Responder</button>
+                        </div>
+                    </div>
+                `;
+                container.insertBefore(newComment, container.firstChild);
+                input.value = '';
+            }
+        }
+
+        function selectCommunity(communityId) {
+            // Update community display logic here
+            console.log('Selected community:', communityId);
+        }
+
+        function showCreateScanGroup() {
+            document.getElementById('create-scan-modal').classList.remove('hidden');
+        }
+
+        function hideCreateScanGroup() {
+            document.getElementById('create-scan-modal').classList.add('hidden');
+        }
+
+        // Initialize with home page
+        showPage('home');
+
+        // Handle Enter key in comment input
+        document.getElementById('comment-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                addComment();
+            }
+        });
+
+        // Handle keyboard navigation in reader
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('reader-page').classList.contains('hidden')) return;
+            
+            if (e.key === 'ArrowLeft') {
+                prevPage();
+            } else if (e.key === 'ArrowRight') {
+                nextPage();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96b290da71aca9ea',t:'MTc1NDUyNTU4Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
