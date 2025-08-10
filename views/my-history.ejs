@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial - Tanuki</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black text-white font-sans">
+
+    <%- include('partials/navbar') %>
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        <h2 class="text-2xl font-bold mb-4">Mi Historial de Lectura</h2>
+
+        <% if (history.length === 0) { %>
+            <p class="text-neutral-400">Aún no has leído ningún manga.</p>
+        <% } else { %>
+            <ul class="space-y-4">
+                <% history.forEach(entry => { %>
+                    <li class="bg-neutral-900 p-4 rounded-lg flex items-center space-x-4">
+                        <img src="<%= entry.cover %>" alt="<%= entry.title %>" class="w-16 h-24 object-cover rounded-md">
+                        <div>
+                            <h3 class="text-lg font-semibold"><%= entry.title %></h3>
+                            <p class="text-sm text-neutral-400">Último capítulo leído: <%= entry.lastChapter %></p>
+                        </div>
+                    </li>
+                <% }) %>
+            </ul>
+        <% } %>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || "Tanuki" %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="bg-black text-white">
+
+<!-- Navbar -->
+<nav class="bg-black border-b border-neutral-800 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <div class="flex items-center space-x-8">
+                <h1 class="text-2xl font-bold text-orange-500 cursor-pointer" onclick="location.href='/'">Tanuki</h1>
+                <div class="hidden md:flex space-x-2">
+                    <a href="/my-library" class="px-3 py-2 rounded-md font-semibold text-neutral-300 hover:bg-neutral-800 hover:text-orange-400">Biblioteca</a>
+                    <a href="/communities" class="px-3 py-2 rounded-md font-semibold text-neutral-300 hover:bg-neutral-800 hover:text-orange-400">Comunidades</a>
+                    <a href="/groups" class="px-3 py-2 rounded-md font-semibold text-neutral-300 hover:bg-neutral-800 hover:text-orange-400">Grupos</a>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <% if (user) { %>
+                    <img src="<%= user.avatar || '/default-avatar.png' %>" alt="Avatar" class="w-8 h-8 rounded-full">
+                    <span><%= user.username %></span>
+                    <a href="/logout" class="text-orange-500 hover:underline">Cerrar sesión</a>
+                <% } else { %>
+                    <a href="/login" class="text-orange-500 hover:underline font-semibold">Iniciar sesión</a>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black text-white">
+    <%- include('partials/navbar') %>
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        <h2 class="text-2xl font-bold mb-4">Historial de lectura</h2>
+        <% if (historial.length === 0) { %>
+            <p class="text-neutral-400">No has leído ningún manga aún.</p>
+        <% } else { %>
+            <div class="space-y-4">
+                <% historial.forEach(item => { %>
+                    <div class="bg-neutral-900 p-4 rounded-lg hover:bg-neutral-800 transition">
+                        <h3 class="text-lg font-semibold"><%= item.title %></h3>
+                        <p class="text-sm text-neutral-400">Último capítulo leído: <%= item.last_chapter %></p>
+                        <p class="text-xs text-neutral-500">Última lectura: <%= item.last_read_at %></p>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+    </div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<%- include("partials/header") %>
+
+<div class="max-w-7xl mx-auto px-4 py-6">
+    <h2 class="text-2xl font-bold mb-4">Grupos</h2>
+
+    <% if (groups && groups.length) { %>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <% groups.forEach(group => { %>
+                <div class="card bg-neutral-900 p-4 rounded-lg">
+                    <img src="<%= group.cover %>" alt="<%= group.name %>" class="w-full h-40 object-cover rounded-lg">
+                    <h3 class="text-lg font-semibold mt-3"><%= group.name %></h3>
+                    <p class="text-sm text-neutral-400 mt-1"><%= group.description %></p>
+                </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <p class="text-neutral-400">No hay grupos disponibles.</p>
+    <% } %>
+</div>
+
+<%- include("partials/footer") %>

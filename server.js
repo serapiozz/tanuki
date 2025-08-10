@@ -22,7 +22,6 @@ app.use(session({
 
 // ===== CREACIÓN DE TABLAS =====
 db.serialize(() => {
-    // Usuarios
     db.run(`
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,7 +31,6 @@ db.serialize(() => {
         )
     `);
 
-    // Biblioteca
     db.run(`
         CREATE TABLE IF NOT EXISTS mangas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,7 +51,16 @@ db.serialize(() => {
         });
     });
 
-    // Comunidades
+    db.run(`
+    CREATE TABLE IF NOT EXISTS user_library (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        manga_id INTEGER NOT NULL,
+        FOREIGN KEY(user_id) REFERENCES users(id),
+        FOREIGN KEY(manga_id) REFERENCES mangas(id)
+    )
+`);
+
     db.run(`
         CREATE TABLE IF NOT EXISTS communities (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -67,16 +74,15 @@ db.serialize(() => {
             if (err) throw err;
             if (row.count === 0) {
                 db.run("INSERT INTO communities (name, description, cover) VALUES (?, ?, ?)",
-                    ["Fans One Piece", "Comunidad para hablar de One Piece", "/images/comm_onepiece.jpg"]);
+                    ["Fans de One Piece", "Comunidad para hablar sobre One Piece", "/images/community-op.jpg"]);
                 db.run("INSERT INTO communities (name, description, cover) VALUES (?, ?, ?)",
-                    ["Naruto Lovers", "Comunidad de fans de Naruto", "/images/comm_naruto.jpg"]);
+                    ["Naruto Shippuden LATAM", "Comunidad de fans de Naruto", "/images/community-naruto.jpg"]);
             }
         });
     });
 
-    // Grupos
     db.run(`
-        CREATE TABLE IF NOT EXISTS scan_groups (
+        CREATE TABLE IF NOT EXISTS groups (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             description TEXT,
@@ -84,38 +90,52 @@ db.serialize(() => {
         )
     `, (err) => {
         if (err) throw err;
-        db.get("SELECT COUNT(*) AS count FROM scan_groups", (err, row) => {
+        db.get("SELECT COUNT(*) AS count FROM groups", (err, row) => {
             if (err) throw err;
             if (row.count === 0) {
-                db.run("INSERT INTO scan_groups (name, description, cover) VALUES (?, ?, ?)",
-                    ["Tanuki Scan", "Grupo oficial de traducciones Tanuki", "/images/group_tanuki.jpg"]);
-                db.run("INSERT INTO scan_groups (name, description, cover) VALUES (?, ?, ?)",
-                    ["MangaFast", "Grupo de traducción rápida de mangas", "/images/group_mangafast.jpg"]);
+                db.run("INSERT INTO groups (name, description, cover) VALUES (?, ?, ?)",
+                    ["ScanLatino", "Grupo de scan de manga en español", "/images/group-scanlatino.jpg"]);
+                db.run("INSERT INTO groups (name, description, cover) VALUES (?, ?, ?)",
+                    ["MangaPro", "Grupo profesional de traducción de manga", "/images/group-mangapro.jpg"]);
             }
         });
     });
-});
+}); // <-- ESTA ES LA ÚNICA CIERRE DEL db.serialize
 
-// ===== Middleware para marcar página y título =====
+    // Datos iniciales
+    db.get("SELECT COUNT(*) AS count FROM mangas", (err, row) => {
+        if (err) throw err;
+        if (row.count === 0) {
+            db.run("INSERT INTO mangas (title, description, cover) VALUES (?, ?, ?)",
+                ["One Piece", "La historia de Luffy y su tripulación en busca del One Piece.", "/images/onepiece.jpg"]);
+            db.run("INSERT INTO mangas (title, description, cover) VALUES (?, ?, ?)",
+                ["Naruto", "La vida de un joven ninja que sueña con ser Hokage.", "/images/naruto.jpg"]);
+        }
+    });
+;
+
+// Middleware para título y página actual
 app.use((req, res, next) => {
     let displayName = "";
     if (req.session.user) {
-        displayName = req.session.user.username;
-        if (displayName.length > 12) {
-            displayName = displayName.substring(0, 12) + "...";
-        }
+        displayName = req.session.user.username.length > 12
+            ? req.session.user.username.substring(0, 12) + "..."
+            : req.session.user.username;
         displayName = ` - ${displayName}`;
     }
 
-    if (req.path === '/' || req.path.startsWith('/biblioteca')) {
-        res.locals.currentPage = 'biblioteca';
-        res.locals.title = `Biblioteca - Tanuki${displayName}`;
+    if (req.path === '/' || req.path.startsWith('/home')) {
+        res.locals.currentPage = 'home';
+        res.locals.title = `Inicio${displayName}`;
+    } else if (req.path.startsWith('/my-library')) {
+        res.locals.currentPage = 'my-library';
+        res.locals.title = `Mi Biblioteca${displayName}`;
     } else if (req.path.startsWith('/communities')) {
         res.locals.currentPage = 'comunidades';
-        res.locals.title = `Comunidades - Tanuki${displayName}`;
-    } else if (req.path.startsWith('/scan-groups')) {
+        res.locals.title = `Comunidades${displayName}`;
+    } else if (req.path.startsWith('/groups')) {
         res.locals.currentPage = 'grupos';
-        res.locals.title = `Grupos - Tanuki${displayName}`;
+        res.locals.title = `Grupos${displayName}`;
     } else {
         res.locals.currentPage = '';
         res.locals.title = `Tanuki${displayName}`;
@@ -125,90 +145,99 @@ app.use((req, res, next) => {
 
 // ===== RUTAS =====
 
-// Biblioteca
+// Home
 app.get("/", (req, res) => {
     db.all("SELECT * FROM mangas", (err, mangas) => {
         if (err) throw err;
-        res.render("tanuki", { user: req.session.user, mangas, communities: [], groups: [], title: res.locals.title });
+        res.render("home", { user: req.session.user, mangas, populares: mangas });
     });
+});
+
+// Biblioteca personal
+app.get("/my-library", (req, res) => {
+    if (!req.session.user) return res.redirect("/login");
+
+    const userId = req.session.user.id;
+    db.all(`
+        SELECT m.* 
+        FROM user_library ul
+        JOIN mangas m ON ul.manga_id = m.id
+        WHERE ul.user_id = ?`,
+        [userId],
+        (err, mangas) => {
+            if (err) throw err;
+            res.render("my-library", {
+                user: req.session.user,
+                mangas
+            });
+        }
+    );
 });
 
 // Comunidades
 app.get("/communities", (req, res) => {
     db.all("SELECT * FROM communities", (err, communities) => {
         if (err) throw err;
-        res.render("tanuki", { user: req.session.user, mangas: [], communities, groups: [], title: res.locals.title });
+        res.render("communities", { 
+            user: req.session.user, 
+            communities,
+            title: "Comunidades",
+            currentPage: "communidades"
+        });
     });
 });
 
 // Grupos
-app.get("/scan-groups", (req, res) => {
-    db.all("SELECT * FROM scan_groups", (err, groups) => {
+app.get("/groups", (req, res) => {
+    db.all("SELECT * FROM groups", (err, groups) => {
         if (err) throw err;
-        res.render("tanuki", { user: req.session.user, mangas: [], communities: [], groups, title: res.locals.title });
+        res.render("groups", { 
+            user: req.session.user, 
+            groups,
+            title: "Grupos",
+            currentPage: "grupos"
+        });
     });
 });
 
-// Login
+
+// Login y registro
 app.get("/login", (req, res) => {
-    res.render("login", { error: null, title: "Iniciar sesión" });
+    res.render("login", { error: null });
 });
 
 app.post("/login", (req, res) => {
     const { username, password } = req.body;
     db.get("SELECT * FROM users WHERE username = ?", [username], (err, user) => {
         if (err) throw err;
-        if (!user) return res.render("login", { error: "Usuario no encontrado", title: "Iniciar sesión" });
-        if (!bcrypt.compareSync(password, user.password)) return res.render("login", { error: "Contraseña incorrecta", title: "Iniciar sesión" });
+        if (!user) return res.render("login", { error: "Usuario no encontrado" });
+        if (!bcrypt.compareSync(password, user.password)) {
+            return res.render("login", { error: "Contraseña incorrecta" });
+        }
         req.session.user = user;
         res.redirect("/");
     });
 });
 
-// Registro
 app.get("/register", (req, res) => {
-    res.render("register", { error: null, title: "Registro" });
+    res.render("register", { error: null });
 });
 
 app.post("/register", (req, res) => {
     const { username, password } = req.body;
     const hashedPassword = bcrypt.hashSync(password, 10);
-    db.run("INSERT INTO users (username, password, avatar) VALUES (?, ?, ?)", 
-        [username, hashedPassword, "/images/default-avatar.png"], (err) => {
-            if (err) return res.render("register", { error: "Usuario ya existe", title: "Registro" });
+    db.run("INSERT INTO users (username, password, avatar) VALUES (?, ?, ?)",
+        [username, hashedPassword, "/images/default-avatar.png"],
+        (err) => {
+            if (err) return res.render("register", { error: "Usuario ya existe" });
             res.redirect("/login");
-    });
+        });
 });
 
 // Logout
 app.get("/logout", (req, res) => {
     req.session.destroy();
     res.redirect("/");
-});
-
-// ===== API de Búsqueda =====
-app.get("/api/search/mangas", (req, res) => {
-    const query = req.query.q ? `%${req.query.q}%` : "%";
-    db.all("SELECT * FROM mangas WHERE title LIKE ?", [query], (err, results) => {
-        if (err) throw err;
-        res.json(results);
-    });
-});
-
-app.get("/api/search/communities", (req, res) => {
-    const query = req.query.q ? `%${req.query.q}%` : "%";
-    db.all("SELECT * FROM communities WHERE name LIKE ?", [query], (err, results) => {
-        if (err) throw err;
-        res.json(results);
-    });
-});
-
-app.get("/api/search/groups", (req, res) => {
-    const query = req.query.q ? `%${req.query.q}%` : "%";
-    db.all("SELECT * FROM scan_groups WHERE name LIKE ?", [query], (err, results) => {
-        if (err) throw err;
-        res.json(results);
-    });
 });
 
 app.listen(3000, () => {

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Biblioteca</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+            color: white;
+        }
+        .card {
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+        .card p {
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        .card:hover {
+            background-color: #1a1a1a;
+            transform: translateY(-3px);
+        }
+        .card:hover img {
+            transform: scale(1.03);
+        }
+        .card:hover p {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Barra de navegación -->
+<%- include("partials/navbar", { currentPage: "biblioteca", user: user }) %>
+
+<div class="max-w-7xl mx-auto px-4 py-6">
+    <h2 class="text-2xl font-bold mb-6">Mi Biblioteca</h2>
+
+    <!-- Tabs -->
+    <div class="flex space-x-4 mb-6">
+        <button class="tab-btn px-4 py-2 bg-orange-500 text-white rounded" data-tab="leyendo">Leyendo</button>
+        <button class="tab-btn px-4 py-2 bg-neutral-800 text-neutral-300 rounded hover:bg-neutral-700" data-tab="completado">Completado</button>
+        <button class="tab-btn px-4 py-2 bg-neutral-800 text-neutral-300 rounded hover:bg-neutral-700" data-tab="pendiente">Pendiente</button>
+    </div>
+
+    <!-- Contenedores -->
+    <div id="leyendo" class="tab-content grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <% if (mangas.length > 0) { %>
+            <% mangas.forEach(manga => { %>
+                <div class="card bg-neutral-900 p-4 rounded-lg">
+                    <img src="<%= manga.cover %>" alt="<%= manga.title %>">
+                    <h3 class="text-lg font-semibold mt-3"><%= manga.title %></h3>
+                    <p class="text-sm text-neutral-400 mt-1"><%= manga.description %></p>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <p class="text-neutral-400">No tienes mangas en esta sección.</p>
+        <% } %>
+    </div>
+
+    <div id="completado" class="tab-content hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <% if (mangas.length > 0) { %>
+            <% mangas.forEach(manga => { %>
+                <div class="card bg-neutral-900 p-4 rounded-lg">
+                    <img src="<%= manga.cover %>" alt="<%= manga.title %>">
+                    <h3 class="text-lg font-semibold mt-3"><%= manga.title %></h3>
+                    <p class="text-sm text-neutral-400 mt-1"><%= manga.description %></p>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <p class="text-neutral-400">No tienes mangas completados.</p>
+        <% } %>
+    </div>
+
+    <div id="pendiente" class="tab-content hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <% if (mangas.length > 0) { %>
+            <% mangas.forEach(manga => { %>
+                <div class="card bg-neutral-900 p-4 rounded-lg">
+                    <img src="<%= manga.cover %>" alt="<%= manga.title %>">
+                    <h3 class="text-lg font-semibold mt-3"><%= manga.title %></h3>
+                    <p class="text-sm text-neutral-400 mt-1"><%= manga.description %></p>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <p class="text-neutral-400">No tienes mangas pendientes.</p>
+        <% } %>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => {
+            b.classList.remove("bg-orange-500", "text-white");
+            b.classList.add("bg-neutral-800", "text-neutral-300");
+        });
+        btn.classList.remove("bg-neutral-800", "text-neutral-300");
+        btn.classList.add("bg-orange-500", "text-white");
+
+        document.querySelectorAll(".tab-content").forEach(c => c.classList.add("hidden"));
+        document.getElementById(btn.dataset.tab).classList.remove("hidden");
+    });
+});
+</script>
+
+</body>
+</html>
